@@ -60,7 +60,7 @@ To encrypt/decrypt your fields automatically, you must configure your MongoClien
 
 ## Usage
 
-The script `password_manager.py` is the main entry point of the application. It performs the following tasks:
+The script `password_assistant.py` is the main entry point of the application. It performs the following tasks:
 
 - Generates a local master key and sets up the KMS providers.
 - Configures the MongoClient to use the local KMS provider.
@@ -73,7 +73,7 @@ The script `password_manager.py` is the main entry point of the application. It 
 To run the script, use the following command:
 
 ```bash
-python3 password_manager.py
+python3 password_assistant.py
 ```
 
 
