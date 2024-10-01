@@ -15,7 +15,7 @@ Today we will be focusing on Automatic Encryption using MongoDB Atlas. But befor
 
 # Envelope Encryption
 An analogy that helped me understand this was - think of a "Lockbox".
-![alt text](https://ae01.alicdn.com/kf/H9e2485b079db4fe2abe2d8b5a7884a7bO/Key-Lock-Box-Combination-Lockbox-with-Code-for-House-Key-Storage-Combo-Door-Locker.jpg_.webp "Title")
+![alt text](lock-1.avif)
 
 We will have a Customer Master Key (CMK) - which in our analogy will be the combination to the lockbox itself.
 And with this CMK, we will protect the "keys inside".
@@ -23,10 +23,10 @@ And with this CMK, we will protect the "keys inside".
 The "keys inside" are going to be called the Data Encryption Keys (DEK). These are the keys that will be used to actually encrypt/decrypt the fields. And access to them will be protected by the CMK.
 
 ## Encrypt
-![alt text](https://rockelitix-ituwr.mongodbstitch.com/imageedit_4_9354567901.png "Title")
+![alt text](lock-2.png)
 
 ## Decrypt
-![alt text](https://rockelitix-ituwr.mongodbstitch.com/imageedit_5_5000319473.png "Title")
+![alt text](lock-3.png)
 
 
 
@@ -37,10 +37,10 @@ To encrypt/decrypt your fields automatically, you must configure your MongoClien
 - Specify a kmsProviders object
 
 # Writing an Encrypted Field
-![alt text](https://www.mongodb.com/docs/manual/images/CSFLE_Write_Encrypted_Data.png "Title")
+![alt text](lock-4.png)
 
 # Reading an Encrypted Field
-![alt text](https://www.mongodb.com/docs/manual/images/CSFLE_Read_Encrypted_Data.png "Title")
+![alt text](lock-5.png)
 
 # Now for the good stuff. Let's see some code in action!
 
