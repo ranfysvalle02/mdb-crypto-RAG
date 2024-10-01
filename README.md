@@ -26,7 +26,48 @@ The "keys inside" are going to be called the Data Encryption Keys (DEK). These a
 ## Decrypt
 ![alt text](lock-3.png)
 
+**Envelope Encryption: A Deeper Dive**
 
+Envelope encryption is a cryptographic technique that involves using two layers of encryption to protect sensitive data. It's a core component of MongoDB's Queryable Encryption (QE) and provides a robust security mechanism.
+
+### Understanding the Layers
+
+1. **Data Encryption Key (DEK):** This is a unique key generated for each piece of data to be encrypted. The DEK is used to directly encrypt and decrypt the data.
+2. **Customer Master Key (CMK):** The CMK is a key that protects the DEKs. It's typically stored in a secure hardware security module (HSM) or a cloud-based key management service.
+
+### The Encryption Process
+
+1. **Data Encryption:** The DEK is used to encrypt the sensitive data, creating a ciphertext.
+2. **DEK Encryption:** The DEK itself is encrypted using the CMK, creating a ciphertext for the DEK.
+3. **Storage:** Both the ciphertext (encrypted data) and the encrypted DEK are stored in the MongoDB database.
+
+### The Decryption Process
+
+1. **DEK Decryption:** The CMK is used to decrypt the encrypted DEK, retrieving the original DEK.
+2. **Data Decryption:** The DEK is used to decrypt the ciphertext, revealing the original data.
+
+### Benefits of Envelope Encryption
+
+* **Strong Security:** By using two layers of encryption, envelope encryption provides a high level of security against unauthorized access.
+* **Flexibility:** It allows for different encryption algorithms and key management strategies to be used for the DEK and CMK.
+* **Efficiency:** The DEK can be reused for multiple pieces of data, improving encryption efficiency.
+* **Compliance:** Envelope encryption can help organizations comply with data privacy regulations by ensuring sensitive data is protected at rest.
+
+**Visual Representation:**
+
+```
+[Plaintext] -> [DEK] -> [Ciphertext]
+[DEK] -> [CMK] -> [Encrypted DEK]
+```
+
+**Key Considerations:**
+
+* **CMK Management:** Ensure the CMK is stored securely and managed properly.
+* **DEK Rotation:** Regularly rotate DEKs to enhance security.
+* **Key Length:** Use appropriate key lengths for both the DEK and CMK to provide adequate security.
+* **Encryption Algorithms:** Choose strong encryption algorithms for both the DEK and CMK.
+
+By understanding the principles of envelope encryption and its role in MongoDB's Queryable Encryption, you can make informed decisions about protecting sensitive data within your MongoDB applications.
 
 # Automatic Encryption/Decryption
 Automatic encryption essentially fetches the keys from the keyvault automatically and lets you get straight to encrypting/decrypting.
