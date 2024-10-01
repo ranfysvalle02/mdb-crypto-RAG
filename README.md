@@ -479,7 +479,7 @@ az_response = az_client.chat.completions.create(
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": "[context]\n```" + str(query_result[0]) +"\n```\n[end context]"},
-                    {"role": "user", "content": "Using ONLY the [context], summarize the events from the logs_info into a list. Use emojis."},
+                    {"role": "user", "content": "Using ONLY the [context], summarize the context in list format. Use emojis."},
                 ]
             )
 print(
