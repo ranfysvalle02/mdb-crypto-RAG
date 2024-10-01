@@ -1,5 +1,7 @@
 # mdb-crypto-RAG
 
+![alt text](compass.png)
+
 # Queryable Encryption + Automatic Encryption(Atlas) + RAG
 ### For this tutorial/demo, need to have [mongocryptd](https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/mongocryptd/) properly configured. This is a critical step
 
