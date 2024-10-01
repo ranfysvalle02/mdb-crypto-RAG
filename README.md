@@ -1,11 +1,7 @@
 # mdb-crypto-RAG
 
 # Queryable Encryption + Automatic Encryption(Atlas) + RAG
-### For this tutorial/demo, need to have mongocryptd or the shared_lib properly configured. This is a critical step
-
-https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/shared-library
-
-https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/mongocryptd/
+### For this tutorial/demo, need to have [mongocryptd](https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/mongocryptd/) properly configured. This is a critical step
 
 ### You can set up Queryable Encryption using the following mechanisms:
 - Automatic Encryption: Enables you to perform encrypted read and write operations without you having to write code to specify how to encrypt fields.
