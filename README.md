@@ -281,7 +281,15 @@ Finally, the script uses the Azure OpenAI client to generate chat completions us
 
 ## Sample Output
 ```
-
+🔎📝 Summary Report:
+- 🌐 Website: www.facebook.com
+- 📆 Creation Date: 2020-01-01
+- 📝 Notes: Account created in Winter 2020 to reconnect with old friends.
+- 🕑 Last Updated: 2020-01-01
+- 📱 IP Addresses:
+    - 192.0.2.0 (success)
+    - 192.0.2.1 (fail)
+    - 192.0.2.1 (fail)
 ```
 
 ## Full Code
