@@ -482,6 +482,14 @@ print(
 )
 ```
 
-## Troubleshooting
+## Conclusion
 
-If you encounter any errors while running the script, make sure that your MongoDB server is running and that you have correctly set up your Azure OpenAI account.
+In this tutorial, we have explored how to leverage MongoDB's Queryable Encryption with Automatic Encryption and Azure OpenAI to enhance data security while maintaining efficient querying capabilities. We have walked through the process of setting up a local Atlas environment, generating a local master key, configuring the MongoClient, creating a data encryption key, and encrypting some documents.
+
+We also delved into the creation of a MongoDB Atlas Vector Search index and how to query encrypted data using the encrypted client. Furthermore, we discussed the benefits of MongoDB Queryable Encryption, including enhanced data security, efficient querying, compliance adherence, and seamless integration with other MongoDB features.
+
+As we move towards a data-driven world, the importance of data security cannot be overstated. Tools like MongoDB's Queryable Encryption and Azure OpenAI provide powerful solutions for protecting sensitive data while still allowing for efficient data analysis and extraction of valuable insights. 
+
+Remember, while this tutorial provides a good starting point, it's essential to understand your specific use case and requirements to effectively implement these tools. Always consider factors like key management, performance impact, and integration with other security measures. 
+
+We hope this tutorial has been informative and helpful in your journey to better data security and efficient querying. Happy coding!
