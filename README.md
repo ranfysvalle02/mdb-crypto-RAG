@@ -44,6 +44,22 @@ To encrypt/decrypt your fields automatically, you must configure your MongoClien
 
 # Now for the good stuff. Let's see some code in action!
 
+## Setting Up a Local Atlas Environment
+
+1. **Pull the Docker Image:**
+
+   * **Latest Version:**
+     ```bash
+     docker pull mongodb/mongodb-atlas-local
+     ```
+
+2. **Run the Database:**
+
+   ```bash
+   docker run -p 27017:27017 mongodb/mongodb-atlas-local
+   ```
+   This command runs the Docker image, exposing port 27017 on your machine for connecting to the database.
+
 ## Usage
 
 The script `password_manager.py` is the main entry point of the application. It performs the following tasks:
