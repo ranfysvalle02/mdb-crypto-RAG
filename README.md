@@ -238,6 +238,11 @@ The script then queries the encrypted data using the encrypted client and prints
 
 Finally, the script uses the Azure OpenAI client to generate chat completions using the queried data.
 
+## Sample Output
+```
+
+```
+
 ## Full Code
 ```python
 import os
@@ -472,9 +477,9 @@ print(
 az_response = az_client.chat.completions.create(
                 model="gpt-35-turbo", # model = "deployment_name".
                 messages=[
-                    {"role": "system", "content": "You are a helpful password assistant who ONLY echoes the context in list format using emojis. "},
-                    {"role": "user", "content": "[context]\n```" + query_result[0]["passwordRecord"]["metadata"]["notes"]+"\n```\n[end context]"},
-                    {"role": "user", "content": "Using ONLY the [context] for the website: " + query_result[0]["passwordRecord"]["website"] + " with the username: " + query_result[0]["passwordRecord"]["username"] + ", present the information in list format."},
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": "[context]\n```" + str(query_result[0]) +"\n```\n[end context]"},
+                    {"role": "user", "content": "Using ONLY the [context], summarize the events from the logs_info into a list. Use emojis."},
                 ]
             )
 print(
