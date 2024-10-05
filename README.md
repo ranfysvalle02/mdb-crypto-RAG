@@ -1,5 +1,7 @@
 # mdb-crypto-RAG
 
+![alt text](llm-risks.png)
+
 ![alt text](compass.png)
 
 # Queryable Encryption + Automatic Encryption(Atlas) + RAG
