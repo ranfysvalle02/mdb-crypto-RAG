@@ -68,3 +68,117 @@ Use synthetic text for development. Avoid logging retrieved chunks, prompts, acc
 ## Running the examples
 
 The MongoDB version is documented in [`README.md`](README.md). The Supabase version uses the same m-stash demo accounts and Voyage/Gemini keys, plus a Supabase URL and server-only service-role key. Its table, vector index, and `match_chunks` RPC setup SQL are also in the README. Both examples explicitly assert that returned hits belong to the verified user and reject a forged token before database access.
+
+
+------
+
+## Appendix: Supabase Implementation & Architecture Trade-Offs
+
+In the comparison script (`supabase-demo.py`), isolating tenant data with an external identity provider (m-stash) requires explicit schema setup, an RPC boundary, and index tuning.
+
+### 1. Schema, Index, and RPC Setup
+
+Because the backend authenticates via m-stash rather than Supabase Auth, the table uses a `text` column for `user_id` (rather than a foreign key to `auth.users`) and restricts access through a `SECURITY DEFINER` or service-role RPC:
+
+```sql
+create extension if not exists vector;
+
+create table chunks (
+  id bigint primary key generated always as identity,
+  user_id text not null,
+  content text not null,
+  embedding vector(1024) not null -- Sized for Voyage embeddings
+);
+
+-- Enable RLS as defense-in-depth (blocks direct anon/authenticated PostgREST queries)
+alter table chunks enable row level security;
+
+-- HNSW index for cosine similarity
+create index on chunks using hnsw (embedding vector_cosine_ops);
+
+-- Narrowly scoped retrieval RPC called by the backend
+create or replace function match_chunks (
+  query_embedding vector(1024),
+  p_user_id text,
+  match_count int default 5
+)
+returns table (
+  id bigint,
+  content text,
+  similarity float
+)
+language sql stable
+as $$
+  select
+    c.id,
+    c.content,
+    1 - (c.embedding <=> query_embedding) as similarity
+  from chunks c
+  where c.user_id = p_user_id
+  order by c.embedding <=> query_embedding
+  limit match_count;
+$$;
+
+```
+
+**Why RLS is still enabled:** Even though `service_role` bypasses Row Level Security, turning RLS on without permissive policies ensures that if the table is ever exposed via Supabase's public Data API (`anon` key), zero rows are readable by default.
+
+---
+
+### 2. Fixing HNSW Recall Drops on Filtered Queries (`pgvector` 0.8.0+)
+
+In `pgvector`, standard HNSW indexes apply `WHERE c.user_id = p_user_id` *after* traversing the graph for candidate neighbors (`hnsw.ef_search`, default `40`). In a multi-tenant table where one user owns only 1% of the chunks, most of those 40 candidates will belong to other tenants and get discarded—causing the query to return fewer than `match_count` rows.
+
+Starting with `pgvector` **0.8.0** (supported on Supabase), you can enable **iterative index scans** inside the RPC or transaction so Postgres continues walking the HNSW graph until it collects enough tenant-owned matches (up to `hnsw.max_scan_tuples`, default `20,000`):
+
+```sql
+create or replace function match_chunks (
+  query_embedding vector(1024),
+  p_user_id text,
+  match_count int default 5
+)
+returns table (id bigint, content text, similarity float)
+language plpgsql stable
+as $$
+begin
+  -- Continue scanning the HNSW graph until match_count tenant rows are found
+  set local hnsw.iterative_scan = relaxed_order;
+
+  return query
+  select
+    c.id,
+    c.content,
+    1 - (c.embedding <=> query_embedding) as similarity
+  from chunks c
+  where c.user_id = p_user_id
+  order by c.embedding <=> query_embedding
+  limit match_count;
+end;
+$$;
+
+```
+
+*Note:* If a tenant has very few chunks or `hnsw.max_scan_tuples` is reached, the query can still return fewer rows than `match_count` without raising an error. For deployments with a small, fixed number of large tenants, partial HNSW indexes per tenant—or partitioning by `user_id`—avoid cross-tenant graph traversal altogether.
+
+---
+
+### 3. Alternative Pattern: Preserving RLS Without a `service_role` Key
+
+Using `service_role` in `supabase-demo.py` keeps the demo simple, but it concentrates security responsibility in application code. If you want Postgres RLS to enforce tenant isolation natively while keeping m-stash as your identity provider, there are two ways to bridge the boundary:
+
+| Approach | How It Works | Trade-Offs |
+| --- | --- | --- |
+| **Custom-Minted Supabase JWT** | After `/v1/auth/verify` succeeds, the backend mints a short-lived JWT containing `sub: claims.uid` and `role: "authenticated"`, signed with Supabase's JWT secret. | Restores native RLS (`auth.jwt() ->> 'sub' = user_id`) without `service_role`, but requires managing token signing and key rotation in your backend. |
+| **Supabase Third-Party Auth (OIDC)** | Configure Supabase to trust your external identity provider's asymmetric JWKS / OIDC discovery endpoint directly. | Eliminates custom token exchange and works across Data APIs and Realtime, but requires the external provider to issue asymmetrically signed OIDC JWTs with a `kid` header. |
+
+With either JWT approach, the database policy enforces ownership automatically on every query:
+
+```sql
+create policy "Tenants can only read their own chunks"
+on chunks for select
+to authenticated
+using ((auth.jwt() ->> 'sub') = user_id);
+
+```
+
+*(Note: Use `auth.jwt() ->> 'sub'` rather than `auth.uid()` if your external identity provider emits string IDs rather than strict UUIDs.)*
